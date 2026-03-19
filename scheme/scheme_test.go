@@ -125,6 +125,10 @@ func TestEndToEnd_T2_N10_Vandermonde(t *testing.T) {
 	testEndToEnd(t, 10, 2, 0, 40) // bw=0 triggers Vandermonde
 }
 
+func TestEndToEnd_T3_N10_BW3(t *testing.T) {
+	testEndToEnd(t, 10, 3, 1, 40) // B_W=3 hardcoded matrix (search result)
+}
+
 func TestEndToEnd_T3_N10_Vandermonde(t *testing.T) {
 	testEndToEnd(t, 10, 3, 0, 40) // Paper's reference configuration (§11)
 }
@@ -378,6 +382,7 @@ func TestNoiseMarginAnalysis(t *testing.T) {
 		{"t=2, N=3, B_W=1", 3, 2, 1},
 		{"t=2, N=10, Vandermonde", 10, 2, 0},
 		{"t=3, N=5, B_W=1", 5, 3, 1},
+		{"t=3, N=10, B_W=3 (search)", 10, 3, 1},
 		{"t=3, N=10, Vandermonde", 10, 3, 0},
 		{"t=4, N=8, Vandermonde", 8, 4, 0},
 		{"t=5, N=10, Vandermonde", 10, 5, 0},

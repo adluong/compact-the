@@ -140,9 +140,20 @@ func HardcodedBW1(N, t int) ([][]int64, error) {
 			{-1, -1, -1},
 		}, nil
 	case t == 3 && N == 10:
-		// W is 8×3. B_W=1 search space is 3^24 — requires randomized search.
-		// Fall through to error; use Vandermonde for N=10.
-		return nil, fmt.Errorf("no hardcoded B_W=1 matrix for N=10, t=3; use Vandermonde")
+		// W is 8×3, B_W=3, found by randomized search with early rejection.
+		// B_W=1 does not exist (exhaustively proven via backtracking).
+		// B_W=2 not found after 38M random trials.
+		// All 120 qualifying sets verified to have non-zero determinant.
+		return [][]int64{
+			{-3, 1, 2},
+			{1, 2, 3},
+			{3, 2, -1},
+			{-3, 2, 3},
+			{-2, 0, 3},
+			{2, 2, 0},
+			{2, 3, 2},
+			{-2, 1, 1},
+		}, nil
 	default:
 		return nil, fmt.Errorf("no hardcoded B_W=1 matrix for N=%d, t=%d", N, t)
 	}

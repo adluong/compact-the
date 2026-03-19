@@ -33,12 +33,13 @@ func Setup(bgvParams bgv.Parameters, numParties, threshold, bw, kappa int) (*par
 	var W [][]int64
 	var err error
 	if bw == 1 {
+		// bw=1 requests "search for smallest B_W matrix available"
 		W, err = lsss.SearchBW1(numParties, threshold)
 		if err != nil {
 			// Fall back to Vandermonde
 			W = lsss.VandermondeW(numParties, threshold)
-			bw = int(lsss.MaxAbsEntry(W))
 		}
+		bw = int(lsss.MaxAbsEntry(W))
 	} else {
 		W = lsss.VandermondeW(numParties, threshold)
 		bw = int(lsss.MaxAbsEntry(W))

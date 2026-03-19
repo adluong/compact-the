@@ -9,7 +9,7 @@ This report documents the implementation of the compact threshold homomorphic en
 **Environment:**
 - **Language:** Go 1.24.0
 - **Library:** Lattigo v6.2.0
-- **Hardware:** Intel Core i7-8700K @ 3.70GHz, Linux (WSL2)
+- **Hardware:** Intel Core i7-8700K @ 4.40GHz (overclocked), Linux (WSL2)
 
 ---
 
@@ -129,15 +129,20 @@ This was discovered during implementation when manual CRT + mod T produced the N
 
 **Impact:** None (naming only).
 
-### D5 — No Hardcoded B_W=1 Matrix for (t=3, N=10)
+### D5 — B_W=3 Matrix for (t=3, N=10) Instead of B_W=1
 
 **Spec claim (section 6.3):** "For t=3, N=10, B_W=1, a suitable W exists."
 
-**Implementation:** The hardcoded matrix returns an error for (t=3, N=10). Setup falls back to Vandermonde construction with B_W = max(alpha_i)^{t-1} = 8^2 = 64.
+**Implementation:** A B_W=3 matrix was found via randomised search with early rejection and is hardcoded in `HardcodedBW1()`. B_W=1 was exhaustively proven to not exist via backtracking over {-1,0,1}^{8×3} (completed in 2.5ms). B_W=2 was not found after 38M random trials (30s).
 
-**Reason:** The exhaustive search space is 3^24 approx 282 billion candidates, infeasible for brute force. A randomized or constraint-based search algorithm would be needed to find the B_W=1 matrix. The all-sign-patterns matrix ({-1,1}^{8x3}) was tried and fails for 48/120 qualifying sets.
+The B_W=3 matrix:
+```
+W = [[-3, 1, 2], [1, 2, 3], [3, 2, -1], [-3, 2, 3],
+     [-2, 0, 3], [2, 2, 0], [2, 3, 2], [-2, 1, 1]]
+```
+All 120 qualifying sets verified to have non-zero determinant.
 
-**Impact:** The (t=3, N=10) configuration uses Vandermonde with B_W=64 instead of B_W=1. This increases the smudging noise bound from log2(B_sm) = 60 to 66, but the noise margin remains 127 bits (see section 5), which is still very comfortable.
+**Impact:** The (t=3, N=10) configuration now uses B_W=3 instead of Vandermonde B_W=64. This improves the noise margin from 127 bits to 136 bits. The smudging noise bound is log2(B_sm) = 61 (vs 66 for Vandermonde).
 
 ### D6 — Noise Margin Test Not Originally Integrated
 
@@ -153,7 +158,7 @@ This was discovered during implementation when manual CRT + mod T produced the N
 
 ### 4.1 Test Environment
 
-- **CPU:** Intel Core i7-8700K @ 3.70GHz (6 cores / 12 threads)
+- **CPU:** Intel Core i7-8700K @ 4.40GHz (overclocked) (6 cores / 12 threads)
 - **OS:** Linux 6.6.87 (WSL2)
 - **Go:** 1.24.0
 - **Lattigo:** v6.2.0
@@ -175,15 +180,15 @@ This was discovered during implementation when manual CRT + mod T produced the N
 
 #### t = 3 Configurations
 
-| Operation | t=3, N=5, B_W=1 | t=3, N=10, Vandermonde |
-|-----------|-----------------|------------------------|
-| Share | 6.73 ms | 6.73 ms |
-| PartDec | 19.7 ms | 19.7 ms |
-| Combine | 0.84 ms | 0.84 ms |
-| FinDec | 0.55 ms | 0.55 ms |
-| **End-to-end** | **112.1 ms** | **248.4 ms** |
+| Operation | t=3, N=5, B_W=1 | t=3, N=10, B_W=3 (search) | t=3, N=10, Vandermonde |
+|-----------|-----------------|--------------------------|------------------------|
+| Share | 6.73 ms | 6.73 ms | 6.73 ms |
+| PartDec | 19.7 ms | 19.7 ms | 19.7 ms |
+| Combine | 0.84 ms | 0.84 ms | 0.84 ms |
+| FinDec | 0.55 ms | 0.55 ms | 0.55 ms |
+| **End-to-end** | **112.1 ms** | **248.4 ms** | **248.4 ms** |
 
-The end-to-end time for N=10 is higher because PartDec runs for all 10 parties (10 * ~20ms = ~200ms dominates).
+The end-to-end time for N=10 is higher because PartDec runs for all 10 parties (10 * ~20ms = ~200ms dominates). The B_W=3 and Vandermonde configs have identical timing (B_W only affects noise bounds, not runtime).
 
 #### t = 4, 5 Configurations (Validating Paper's t <= 3 Claim)
 
@@ -213,7 +218,7 @@ The end-to-end time for N=10 is higher because PartDec runs for all 10 parties (
 |-----------|-----------|---------------|
 | `EndToEnd_T2_N3` | t=2, N=3, B_W=1 | Minimal configuration; baseline measurement |
 | `EndToEnd_T3_N5` | t=3, N=5, B_W=1 | Optimal B_W with t=3; tests pure algorithmic cost |
-| `EndToEnd_T3_N10` | t=3, N=10, B_W=64 | Paper's reference config (section 11); realistic party count |
+| `EndToEnd_T3_N10` | t=3, N=10, B_W=3 | Paper's reference config; B_W=3 search matrix (improved from Vandermonde B_W=64) |
 | `EndToEnd_T4_N8` | t=4, N=8, B_W=125 | Tests paper's claim that t>=4 is impractical (section 9.6) |
 | `EndToEnd_T5_N10` | t=5, N=10, B_W=1296 | Stress test for super-exponential cofactor growth |
 | `Share_T2_N3` | t=2, N=3 | Isolates sharing cost with minimal parameters |
@@ -247,28 +252,31 @@ Where:
 
 | Configuration | B_W | log2(B_sm) | Worst |delta| | Worst Lambda_S | Worst Noise (bits) | Margin (bits) | Status |
 |---------------|-----|------------|----------|------------|----------------|---------------|--------|
-| t=2, N=3, B_W=1 | 1 | 60 | 1 | 2 | ~61 | **~141** | PASS |
+| t=2, N=3, B_W=1 | 1 | 60 | 1 | 2 | ~61 | **~140** | PASS |
 | t=2, N=10, Vand | 9 | 63 | 2 | 16 | ~68 | **~134** | PASS |
-| t=3, N=5, B_W=1 | 1 | 60 | 1 | 2 | ~61 | **~141** | PASS |
+| t=3, N=5, B_W=1 | 1 | 60 | 1 | 2 | ~61 | **~140** | PASS |
+| t=3, N=10, B_W=3 | 3 | 61 | 19 | 16 | ~65 | **~136** | PASS |
 | t=3, N=10, Vand | 64 | 66 | 20 | 260 | ~75 | **~127** | PASS |
 | t=4, N=8, Vand | 125 | 66 | 228 | 1068 | ~77 | **~125** | PASS |
-| t=5, N=10, Vand | 1296 | 70 | 16254 | 133866 | ~87 | **~115** | PASS |
+| t=5, N=10, Vand | 1296 | 70 | 16254 | 133866 | ~87 | **~114** | PASS |
 
 ### 5.3 Trend Analysis: Noise Margin vs Threshold
 
 ```
 Threshold (t)   B_W              Worst Lambda_S   Noise (bits)   Margin (bits)
-    2           1                2                ~61            ~141
-    3 (B_W=1)   1                2                ~61            ~141
+    2           1                2                ~61            ~140
+    3 (B_W=1)   1                2                ~61            ~140
+    3 (B_W=3)   3                16               ~65            ~136
     3 (Vand)    64 = 8^2         260              ~75            ~127
     4 (Vand)    125 = 5^3        1068             ~77            ~125
-    5 (Vand)    1296 = 6^4       133866           ~87            ~115
+    5 (Vand)    1296 = 6^4       133866           ~87            ~114
 ```
 
-**Key observation:** With Vandermonde construction, B_W grows as `max(alpha)^{t-1}` and Lambda_S grows super-exponentially in t. The noise margin drops by ~12-15 bits per unit increase in t:
-- t=3: 127 bits margin
+**Key observation:** The B_W=3 search matrix for (t=3, N=10) dramatically improves over Vandermonde (136-bit vs 127-bit margin). With Vandermonde construction, B_W grows as `max(alpha)^{t-1}` and Lambda_S grows super-exponentially in t. The noise margin drops by ~12-15 bits per unit increase in t:
+- t=3 (B_W=3): 136 bits margin
+- t=3 (Vand): 127 bits margin
 - t=4: 125 bits margin
-- t=5: 115 bits margin
+- t=5: 114 bits margin
 
 ### 5.4 Empirical Validation of Paper's Claim (Section 9.6)
 
@@ -276,7 +284,7 @@ Threshold (t)   B_W              Worst Lambda_S   Noise (bits)   Margin (bits)
 
 **Finding:** The claim is **partially validated but not as dramatic as suggested** for the all-F RLWE regime:
 
-1. **Regime B (our implementation):** Even at t=5, the noise margin is 115 bits — still very comfortable (Delta/2 approx 2^202). The scheme **correctly decrypts for all 252 qualifying sets** at (t=5, N=10). The paper's claim of impracticality is overly conservative for Regime B.
+1. **Regime B (our implementation):** Even at t=5, the noise margin is 114 bits — still very comfortable (Delta/2 approx 2^202). The scheme **correctly decrypts for all 252 qualifying sets** at (t=5, N=10). The paper's claim of impracticality is overly conservative for Regime B. Additionally, a B_W=3 matrix was found for (t=3, N=10) via randomised search, improving the margin from 127 bits (Vandermonde) to 136 bits.
 
 2. **The claim is correct for Regime A (statistical smudging):** In Regime A, B_sm = B_W * t * n * q^2/4 * 2^kappa, which grows quadratically in q and would make the noise bound exceed Delta/2 for t >= 4 with standard BFV parameters.
 

@@ -157,8 +157,12 @@ func BenchmarkEndToEnd_T3_N5(b *testing.B) {
 	benchEndToEnd(b, 5, 3, 1) // B_W=1
 }
 
+func BenchmarkEndToEnd_T3_N10_BW3(b *testing.B) {
+	benchEndToEnd(b, 10, 3, 1) // B_W=3 search matrix
+}
+
 func BenchmarkEndToEnd_T3_N10(b *testing.B) {
-	benchEndToEnd(b, 10, 3, 0) // Vandermonde, paper's reference config (§11)
+	benchEndToEnd(b, 10, 3, 0) // Vandermonde, B_W=64
 }
 
 func BenchmarkEndToEnd_T4_N8(b *testing.B) {
