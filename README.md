@@ -113,9 +113,9 @@ Note: PartDec is dominated by smudging noise sampling (~17 ms of 19.7 ms); the r
 
 ## Noise Margin Analysis
 
-Correctness condition: |delta| * B_ct + Lambda_S * B_sm < Delta/2, where Delta/2 = Q/(2T) ~ 2^202.
+Correctness condition: \|delta\| * B_ct + Lambda_S * B_sm < Delta/2, where Delta/2 = Q/(2T) ~ 2^202.
 
-| Configuration | B_W | log2(B_sm) | Worst |delta| | Worst Lambda_S | Noise (bits) | Margin (bits) |
+| Configuration | B_W | log2(B_sm) | Worst \|delta\| | Worst Lambda_S | Noise (bits) | Margin (bits) |
 |---|---|---|---|---|---|---|
 | t=2, N=3, B_W=1 | 1 | 60 | 1 | 2 | ~61 | **141** |
 | t=2, N=10, Vand | 9 | 63 | 2 | 16 | ~68 | **134** |
