@@ -1,0 +1,16 @@
+goos: linux
+goarch: amd64
+pkg: compact-the/bench
+cpu: Intel(R) Core(TM) i7-8700K CPU @ 3.70GHz
+BenchmarkCombine_T5_N10 	    1887	   1975797 ns/op	  791300 B/op	     127 allocs/op
+BenchmarkCombine_T5_N10 	    1947	   1857928 ns/op	  791299 B/op	     127 allocs/op
+BenchmarkCombine_T5_N10 	    2254	   1813765 ns/op	  791300 B/op	     127 allocs/op
+BenchmarkCombine_T5_N10 	    1968	   2239666 ns/op	  791300 B/op	     127 allocs/op
+BenchmarkCombine_T5_N10 	    1615	   2686846 ns/op	  791300 B/op	     127 allocs/op
+BenchmarkCombine_T5_N10 	     648	   5259969 ns/op	  791300 B/op	     127 allocs/op
+BenchmarkCombine_T5_N10 	    1468	   2938780 ns/op	  791300 B/op	     127 allocs/op
+BenchmarkCombine_T5_N10 	    1501	   3190178 ns/op	  791299 B/op	     127 allocs/op
+BenchmarkCombine_T5_N10 	    1147	   2827278 ns/op	  791300 B/op	     127 allocs/op
+BenchmarkCombine_T5_N10 	    1592	   2730894 ns/op	  791300 B/op	     127 allocs/op
+PASS
+ok  	compact-the/bench	51.278s

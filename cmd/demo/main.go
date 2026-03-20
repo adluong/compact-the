@@ -39,7 +39,7 @@ func main() {
 	fmt.Printf("  Ring degree: n = %d\n", bgvParams.N())
 	fmt.Printf("  log₂ Q ≈ %d\n", bgvParams.RingQ().ModulusAtLevel[bgvParams.MaxLevel()].BitLen())
 	fmt.Printf("  Plaintext modulus: T = %d\n", bgvParams.PlaintextModulus())
-	fmt.Printf("  Smudging noise: log₂ B_sm = %d\n", pp.BsmLog2)
+	fmt.Printf("  Smudging noise: log₂ B_sm = %d\n", pp.Bsm.BitLen())
 	fmt.Printf("  Qualifying sets: C(%d,%d) = %d\n\n", N, t, len(lsss.AllQualifyingSets(N, t)))
 
 	// KeyGen

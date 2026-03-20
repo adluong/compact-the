@@ -18,7 +18,7 @@ type PublicParams struct {
 	M         [][]int64      // N × T share-generation matrix
 	W         [][]int64      // (N-T+1) × T L-party block
 	Kappa     int            // Statistical security parameter κ
-	BsmLog2   int            // log₂(B_sm) smudging noise bound
+	Bsm       *big.Int       // B_sm smudging noise bound (exact)
 }
 
 // NewBGVParams creates Lattigo BGV parameters for the given configuration.

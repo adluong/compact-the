@@ -1,0 +1,36 @@
+goos: linux
+goarch: amd64
+pkg: compact-the/bench
+cpu: Intel(R) Core(TM) i7-8700K CPU @ 3.70GHz
+BenchmarkEncrypt    	     781	   4786726 ns/op	  802851 B/op	     139 allocs/op
+BenchmarkEncrypt    	     777	   4795914 ns/op	  802857 B/op	     139 allocs/op
+BenchmarkEncrypt    	     740	   4929496 ns/op	  802922 B/op	     139 allocs/op
+BenchmarkEncrypt    	     672	   4992576 ns/op	  803062 B/op	     139 allocs/op
+BenchmarkEncrypt    	     768	   4765476 ns/op	  802872 B/op	     139 allocs/op
+BenchmarkEncrypt    	     654	   4787542 ns/op	  803114 B/op	     139 allocs/op
+BenchmarkEncrypt    	     758	   4875161 ns/op	  802894 B/op	     139 allocs/op
+BenchmarkEncrypt    	     751	   4862395 ns/op	  802903 B/op	     139 allocs/op
+BenchmarkEncrypt    	     716	   4901912 ns/op	  802973 B/op	     139 allocs/op
+BenchmarkEncrypt    	     726	   4984925 ns/op	  802949 B/op	     139 allocs/op
+BenchmarkKeyGen     	     753	   4814848 ns/op	 1014114 B/op	     681 allocs/op
+BenchmarkKeyGen     	     702	   5010916 ns/op	 1014106 B/op	     681 allocs/op
+BenchmarkKeyGen     	     708	   4602244 ns/op	 1014106 B/op	     681 allocs/op
+BenchmarkKeyGen     	     763	   4574318 ns/op	 1014106 B/op	     681 allocs/op
+BenchmarkKeyGen     	     789	   4422133 ns/op	 1014105 B/op	     681 allocs/op
+BenchmarkKeyGen     	     771	   4470162 ns/op	 1014106 B/op	     681 allocs/op
+BenchmarkKeyGen     	     792	   4452032 ns/op	 1014106 B/op	     681 allocs/op
+BenchmarkKeyGen     	     756	   4491948 ns/op	 1014106 B/op	     681 allocs/op
+BenchmarkKeyGen     	     730	   4589717 ns/op	 1014106 B/op	     681 allocs/op
+BenchmarkKeyGen     	     775	   4826632 ns/op	 1014106 B/op	     681 allocs/op
+BenchmarkBFVDecrypt 	    3458	    887365 ns/op	  264221 B/op	      54 allocs/op
+BenchmarkBFVDecrypt 	    4009	    918315 ns/op	  264201 B/op	      54 allocs/op
+BenchmarkBFVDecrypt 	    4104	    893599 ns/op	  264198 B/op	      54 allocs/op
+BenchmarkBFVDecrypt 	    3892	    896451 ns/op	  264205 B/op	      54 allocs/op
+BenchmarkBFVDecrypt 	    4100	    871627 ns/op	  264198 B/op	      54 allocs/op
+BenchmarkBFVDecrypt 	    3966	    910051 ns/op	  264202 B/op	      54 allocs/op
+BenchmarkBFVDecrypt 	    3951	    905963 ns/op	  264202 B/op	      54 allocs/op
+BenchmarkBFVDecrypt 	    4233	    893663 ns/op	  264194 B/op	      54 allocs/op
+BenchmarkBFVDecrypt 	    4069	    865934 ns/op	  264199 B/op	      54 allocs/op
+BenchmarkBFVDecrypt 	    3460	    892780 ns/op	  264221 B/op	      54 allocs/op
+PASS
+ok  	compact-the/bench	120.877s

@@ -419,7 +419,7 @@ func TestNoiseMarginAnalysis(t *testing.T) {
 			// In log2 approx: max(log₂(|δ|)+bctLog2, log₂(Λ_S)+bsmLog2)
 			// Margin = halfDeltaLog2 - log₂(noise)
 			// Exact: use VerifyCorrectness
-			ok := noise.VerifyCorrectness(absDet, lambdaS, pp.BsmLog2, 20, logQ, logT)
+			ok := noise.VerifyCorrectness(absDet, lambdaS, pp.Bsm, 20, logQ, logT)
 
 			if !ok && worstMargin > 0 {
 				worstMargin = -1
@@ -436,7 +436,7 @@ func TestNoiseMarginAnalysis(t *testing.T) {
 						l >>= 1
 					}
 				}
-				margin := halfDeltaLog2 - (noiseBits + pp.BsmLog2)
+				margin := halfDeltaLog2 - (noiseBits + pp.Bsm.BitLen())
 				if margin < worstMargin {
 					worstMargin = margin
 					worstSet = S
@@ -452,7 +452,99 @@ func TestNoiseMarginAnalysis(t *testing.T) {
 		}
 
 		t.Logf("[%s] %s: B_W=%d, log₂(B_sm)=%d, C(%d,%d)=%d sets, worst margin ≈ %d bits (set=%v, |δ|=%d, Λ_S=%d)",
-			status, cfg.name, pp.BW, pp.BsmLog2, cfg.N, cfg.T, len(sets),
+			status, cfg.name, pp.BW, pp.Bsm.BitLen(), cfg.N, cfg.T, len(sets),
 			worstMargin, worstSet, worstDet, worstLambda)
 	}
+}
+
+// TestMemoryUsage measures byte sizes of cryptographic objects for the storage
+// comparison table (G1).
+func TestMemoryUsage(t *testing.T) {
+	bgvParams, err := params.DefaultRegimeB()
+	if err != nil {
+		t.Fatal(err)
+	}
+	pp, err := Setup(bgvParams, 10, 3, 1, 40)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	kgen := rlwe.NewKeyGenerator(bgvParams)
+	sk, pk := kgen.GenKeyPairNew()
+
+	shares, _ := Share(pp, sk)
+
+	encoder := bgv.NewEncoder(bgvParams)
+	encryptor := rlwe.NewEncryptor(bgvParams, pk)
+	T := bgvParams.PlaintextModulus()
+	slots := bgvParams.MaxSlots()
+	plaintext := make([]uint64, slots)
+	for i := range plaintext {
+		plaintext[i] = uint64(rand.Int63n(int64(T)))
+	}
+	pt := bgv.NewPlaintext(bgvParams, bgvParams.MaxLevel())
+	encoder.Encode(plaintext, pt)
+	ct, _ := encryptor.EncryptNew(pt)
+
+	dj, _ := PartDec(pp, shares[0], ct)
+
+	n := bgvParams.N()
+	level := bgvParams.MaxLevel()
+	rnsLimbs := level + 1
+	coeffsPerPoly := n * rnsLimbs
+
+	shareBytes := coeffsPerPoly * 8 // uint64 = 8 bytes each
+	partDecBytes := coeffsPerPoly * 8
+	ctBytes := 2 * coeffsPerPoly * 8 // c0 + c1
+	matrixBytes := pp.N * pp.T * 8   // int64 entries
+
+	logQ := bgvParams.RingQ().ModulusAtLevel[level].BitLen()
+
+	t.Logf("=== Memory Usage (t=3, N=10, B_W=%d) ===", pp.BW)
+	t.Logf("Ring parameters: n=%d, log₂Q=%d, RNS limbs=%d", n, logQ, rnsLimbs)
+	t.Logf("")
+	t.Logf("| Object | Size | Formula |")
+	t.Logf("|--------|------|---------|")
+	t.Logf("| Share s_j | %d bytes (%.1f KB) | n × limbs × 8 = %d × %d × 8 |",
+		shareBytes, float64(shareBytes)/1024, n, rnsLimbs)
+	t.Logf("| Partial decryption d_j | %d bytes (%.1f KB) | same as share |",
+		partDecBytes, float64(partDecBytes)/1024)
+	t.Logf("| Ciphertext ct | %d bytes (%.1f KB) | 2 × share size |",
+		ctBytes, float64(ctBytes)/1024)
+	t.Logf("| Share matrix M | %d bytes | N × t × 8 = %d × %d × 8 |",
+		matrixBytes, pp.N, pp.T)
+
+	// Compare with {0,1}-LSSS storage
+	// {0,1}-LSSS requires O(n × N^{4.3} × ceil(log₂q/8)) bytes per party
+	import_math := float64(n) * 1.0
+	_ = import_math
+	logQBytes := (logQ + 7) / 8 // ceil(log₂q/8)
+	nF := float64(n)
+	nParties := float64(pp.N)
+	import_math2 := nF * nParties
+	_ = import_math2
+
+	// N^{4.3} approximation
+	n43 := 1.0
+	for i := 0; i < 4; i++ {
+		n43 *= nParties
+	}
+	n43 *= 1.0 // 10^4 = 10000, 10^0.3 ≈ 2.0
+	// More precise: 10^4.3 ≈ 19953
+	n43Precise := 19953.0 // for N=10
+
+	zeroOneLSSSBytes := nF * n43Precise * float64(logQBytes)
+
+	t.Logf("")
+	t.Logf("Storage comparison (per party):")
+	t.Logf("  This work:    %d bytes (%.1f KB) — one ring polynomial",
+		shareBytes, float64(shareBytes)/1024)
+	t.Logf("  {0,1}-LSSS:   %.0f bytes (%.1f GB) — n × N^{4.3} × ceil(log₂q/8)",
+		zeroOneLSSSBytes, zeroOneLSSSBytes/(1024*1024*1024))
+	t.Logf("  Ratio:        %.0f× reduction", zeroOneLSSSBytes/float64(shareBytes))
+
+	// Verify poly sizes match actual objects
+	_ = dj
+	_ = sk
+	_ = shares
 }

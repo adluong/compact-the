@@ -20,9 +20,8 @@ func Setup(bgvParams bgv.Parameters, numParties, threshold, bw, kappa int) (*par
 	if threshold > numParties {
 		return nil, fmt.Errorf("threshold %d > number of parties %d", threshold, numParties)
 	}
-	if threshold > 3 {
-		fmt.Printf("WARNING: threshold %d > 3 — cofactor bounds grow super-exponentially; noise margin may be insufficient\n", threshold)
-	}
+	// Note: threshold > 3 has super-exponential cofactor growth.
+	// Noise margin may be insufficient under Regime A (statistical smudging).
 
 	// Verify BGV parameters
 	if err := params.VerifyParams(bgvParams, numParties); err != nil {
@@ -57,7 +56,7 @@ func Setup(bgvParams bgv.Parameters, numParties, threshold, bw, kappa int) (*par
 
 	// Compute B_sm for Regime B
 	bctLog2 := 20 // approximate ciphertext noise bound
-	bsmLog2 := noise.ComputeBsmRegimeB(bw, bctLog2, kappa)
+	bsm := noise.ComputeBsmRegimeB(bw, bctLog2, kappa)
 
 	pp := &params.PublicParams{
 		BGVParams: bgvParams,
@@ -67,7 +66,7 @@ func Setup(bgvParams bgv.Parameters, numParties, threshold, bw, kappa int) (*par
 		M:         M,
 		W:         W,
 		Kappa:     kappa,
-		BsmLog2:   bsmLog2,
+		Bsm:       bsm,
 	}
 
 	return pp, nil

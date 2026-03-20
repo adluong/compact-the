@@ -1,0 +1,16 @@
+goos: linux
+goarch: amd64
+pkg: compact-the/bench
+cpu: Intel(R) Core(TM) i7-8700K CPU @ 3.70GHz
+BenchmarkThresholdDecrypt_T2_N3 	     368	  11258584 ns/op	 7584245 B/op	     410 allocs/op
+BenchmarkThresholdDecrypt_T2_N3 	     295	  11278684 ns/op	 7576661 B/op	     409 allocs/op
+BenchmarkThresholdDecrypt_T2_N3 	     339	  10811686 ns/op	 7578414 B/op	     409 allocs/op
+BenchmarkThresholdDecrypt_T2_N3 	     321	  11272676 ns/op	 7582138 B/op	     410 allocs/op
+BenchmarkThresholdDecrypt_T2_N3 	     325	  11269694 ns/op	 7579101 B/op	     409 allocs/op
+BenchmarkThresholdDecrypt_T2_N3 	     316	  11152700 ns/op	 7575409 B/op	     409 allocs/op
+BenchmarkThresholdDecrypt_T2_N3 	     315	  11017549 ns/op	 7577158 B/op	     409 allocs/op
+BenchmarkThresholdDecrypt_T2_N3 	     344	  11526837 ns/op	 7581982 B/op	     410 allocs/op
+BenchmarkThresholdDecrypt_T2_N3 	     309	  10897675 ns/op	 7583443 B/op	     409 allocs/op
+BenchmarkThresholdDecrypt_T2_N3 	     318	  10822143 ns/op	 7580402 B/op	     410 allocs/op
+PASS
+ok  	compact-the/bench	48.250s

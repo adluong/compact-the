@@ -1,0 +1,36 @@
+goos: linux
+goarch: amd64
+pkg: compact-the/bench
+cpu: Intel(R) Core(TM) i7-8700K CPU @ 3.70GHz
+BenchmarkPartDec_RingMul              	    2870	   1259691 ns/op	  786723 B/op	      15 allocs/op
+BenchmarkPartDec_RingMul              	    3003	   1208172 ns/op	  786723 B/op	      15 allocs/op
+BenchmarkPartDec_RingMul              	    3574	   1199342 ns/op	  786723 B/op	      15 allocs/op
+BenchmarkPartDec_RingMul              	    3272	   1210137 ns/op	  786723 B/op	      15 allocs/op
+BenchmarkPartDec_RingMul              	    2955	   1205808 ns/op	  786723 B/op	      15 allocs/op
+BenchmarkPartDec_RingMul              	    3018	   1219966 ns/op	  786723 B/op	      15 allocs/op
+BenchmarkPartDec_RingMul              	    2834	   1205964 ns/op	  786723 B/op	      15 allocs/op
+BenchmarkPartDec_RingMul              	    2719	   1218015 ns/op	  786723 B/op	      15 allocs/op
+BenchmarkPartDec_RingMul              	    2720	   1268014 ns/op	  786723 B/op	      15 allocs/op
+BenchmarkPartDec_RingMul              	    2715	   1184621 ns/op	  786723 B/op	      15 allocs/op
+BenchmarkPartDec_SmudgingNoise        	     247	  14328517 ns/op	 1439731 B/op	  122609 allocs/op
+BenchmarkPartDec_SmudgingNoise        	     242	  13954205 ns/op	 1439733 B/op	  122607 allocs/op
+BenchmarkPartDec_SmudgingNoise        	     242	  14613384 ns/op	 1439732 B/op	  122609 allocs/op
+BenchmarkPartDec_SmudgingNoise        	     249	  14458797 ns/op	 1439717 B/op	  122607 allocs/op
+BenchmarkPartDec_SmudgingNoise        	     246	  14266843 ns/op	 1439715 B/op	  122607 allocs/op
+BenchmarkPartDec_SmudgingNoise        	     243	  14487315 ns/op	 1439721 B/op	  122608 allocs/op
+BenchmarkPartDec_SmudgingNoise        	     258	  14347536 ns/op	 1439727 B/op	  122609 allocs/op
+BenchmarkPartDec_SmudgingNoise        	     234	  14863885 ns/op	 1439710 B/op	  122607 allocs/op
+BenchmarkPartDec_SmudgingNoise        	     237	  14557068 ns/op	 1439713 B/op	  122607 allocs/op
+BenchmarkPartDec_SmudgingNoise        	     254	  14417925 ns/op	 1439724 B/op	  122608 allocs/op
+BenchmarkPartDec_SmudgingNoise_CSPRNG 	    5692	    662145 ns/op	  393393 B/op	       8 allocs/op
+BenchmarkPartDec_SmudgingNoise_CSPRNG 	    5444	    678120 ns/op	  393393 B/op	       8 allocs/op
+BenchmarkPartDec_SmudgingNoise_CSPRNG 	    4951	    671394 ns/op	  393393 B/op	       8 allocs/op
+BenchmarkPartDec_SmudgingNoise_CSPRNG 	    4682	    670944 ns/op	  393393 B/op	       8 allocs/op
+BenchmarkPartDec_SmudgingNoise_CSPRNG 	    5142	    660834 ns/op	  393393 B/op	       8 allocs/op
+BenchmarkPartDec_SmudgingNoise_CSPRNG 	    5452	    657659 ns/op	  393393 B/op	       8 allocs/op
+BenchmarkPartDec_SmudgingNoise_CSPRNG 	    5821	    662229 ns/op	  393393 B/op	       8 allocs/op
+BenchmarkPartDec_SmudgingNoise_CSPRNG 	    5413	    667794 ns/op	  393393 B/op	       8 allocs/op
+BenchmarkPartDec_SmudgingNoise_CSPRNG 	    4888	    669926 ns/op	  393393 B/op	       8 allocs/op
+BenchmarkPartDec_SmudgingNoise_CSPRNG 	    5646	    662932 ns/op	  393393 B/op	       8 allocs/op
+PASS
+ok  	compact-the/bench	131.347s

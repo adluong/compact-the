@@ -1,0 +1,26 @@
+goos: linux
+goarch: amd64
+pkg: compact-the/bench
+cpu: Intel(R) Core(TM) i7-8700K CPU @ 3.70GHz
+BenchmarkLattigoMultipartyDecrypt_N10 	     283	  11561704 ns/op	 5522968 B/op	     207 allocs/op
+BenchmarkLattigoMultipartyDecrypt_N10 	     302	  11823810 ns/op	 5522848 B/op	     207 allocs/op
+BenchmarkLattigoMultipartyDecrypt_N10 	     304	  11960116 ns/op	 5522838 B/op	     207 allocs/op
+BenchmarkLattigoMultipartyDecrypt_N10 	     322	  11744591 ns/op	 5522741 B/op	     207 allocs/op
+BenchmarkLattigoMultipartyDecrypt_N10 	     324	  11852305 ns/op	 5522734 B/op	     207 allocs/op
+BenchmarkLattigoMultipartyDecrypt_N10 	     285	  11703381 ns/op	 5522950 B/op	     207 allocs/op
+BenchmarkLattigoMultipartyDecrypt_N10 	     304	  12524230 ns/op	 5522841 B/op	     207 allocs/op
+BenchmarkLattigoMultipartyDecrypt_N10 	     302	  11722949 ns/op	 5522850 B/op	     207 allocs/op
+BenchmarkLattigoMultipartyDecrypt_N10 	     313	  11537842 ns/op	 5522785 B/op	     207 allocs/op
+BenchmarkLattigoMultipartyDecrypt_N10 	     303	  11753884 ns/op	 5522849 B/op	     207 allocs/op
+BenchmarkLattigoMultipartyDecrypt_N3  	     885	   4236062 ns/op	 1841798 B/op	     100 allocs/op
+BenchmarkLattigoMultipartyDecrypt_N3  	     891	   4183453 ns/op	 1841869 B/op	     100 allocs/op
+BenchmarkLattigoMultipartyDecrypt_N3  	     894	   4361395 ns/op	 1841793 B/op	     100 allocs/op
+BenchmarkLattigoMultipartyDecrypt_N3  	     866	   4178150 ns/op	 1841813 B/op	     100 allocs/op
+BenchmarkLattigoMultipartyDecrypt_N3  	     825	   4251508 ns/op	 1841921 B/op	     100 allocs/op
+BenchmarkLattigoMultipartyDecrypt_N3  	     828	   4010470 ns/op	 1841921 B/op	     100 allocs/op
+BenchmarkLattigoMultipartyDecrypt_N3  	     799	   4024917 ns/op	 1841865 B/op	     100 allocs/op
+BenchmarkLattigoMultipartyDecrypt_N3  	     910	   4046882 ns/op	 1841856 B/op	     100 allocs/op
+BenchmarkLattigoMultipartyDecrypt_N3  	     864	   3906398 ns/op	 1841813 B/op	     100 allocs/op
+BenchmarkLattigoMultipartyDecrypt_N3  	     922	   3857097 ns/op	 1841777 B/op	     100 allocs/op
+PASS
+ok  	compact-the/bench	89.594s

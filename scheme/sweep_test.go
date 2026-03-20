@@ -88,7 +88,7 @@ func TestParameterSweep(t *testing.T) {
 				}
 				lambdaS := lsss.LambdaS(cofactors)
 
-				ok := noise.VerifyCorrectness(absDet, lambdaS, pp.BsmLog2, 20, logQ, logT)
+				ok := noise.VerifyCorrectness(absDet, lambdaS, pp.Bsm, 20, logQ, logT)
 				if !ok {
 					allPass = false
 					break
@@ -100,7 +100,7 @@ func TestParameterSweep(t *testing.T) {
 					noiseBits++
 					l >>= 1
 				}
-				margin := halfDeltaLog2 - (noiseBits + pp.BsmLog2)
+				margin := halfDeltaLog2 - (noiseBits + pp.Bsm.BitLen())
 				if margin < worstMargin {
 					worstMargin = margin
 				}
@@ -111,7 +111,7 @@ func TestParameterSweep(t *testing.T) {
 				bestMargin = worstMargin
 				bestLogQBits = logQ
 				bestBW = pp.BW
-				bestBsm = pp.BsmLog2
+				bestBsm = pp.Bsm.BitLen()
 				break // Found the smallest valid LogQ
 			}
 		}
@@ -151,12 +151,12 @@ func TestParameterSweep(t *testing.T) {
 				noiseBits++
 				l >>= 1
 			}
-			margin := halfDeltaLog2 - (noiseBits + pp.BsmLog2)
+			margin := halfDeltaLog2 - (noiseBits + pp.Bsm.BitLen())
 			if margin < worstMargin {
 				worstMargin = margin
 			}
 		}
 		t.Logf("%s: margin=%d bits, B_W=%d, log₂Bsm=%d",
-			cfg.name, worstMargin, pp.BW, pp.BsmLog2)
+			cfg.name, worstMargin, pp.BW, pp.Bsm.BitLen())
 	}
 }

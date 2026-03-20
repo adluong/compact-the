@@ -41,12 +41,53 @@ func PartDec(pp *params.PublicParams, share ring.Poly, ct *rlwe.Ciphertext) (rin
 	// Convert back to coefficient form
 	ringQLvl.INTT(signal, signal)
 
-	// Sample smudging noise (uniform in [-B_sm, B_sm])
-	smudgingNoise := noise.SampleSmudgingNoise(ringQLvl, pp.BsmLog2)
+	// Sample smudging noise (uniform in [-B_sm, B_sm]) using CSPRNG
+	smudgingNoise := noise.SampleSmudgingNoiseFast(ringQLvl, pp.Bsm)
 
 	// d_j = signal + smudging noise
 	dj := ringQ.NewPoly()
 	ringQLvl.Add(signal, smudgingNoise, dj)
 
 	return dj, nil
+}
+
+// PartDecRingMul computes only the ring multiplication c_1 · s_j (no noise).
+// Exported for benchmark decomposition.
+func PartDecRingMul(pp *params.PublicParams, share ring.Poly, ct *rlwe.Ciphertext) ring.Poly {
+	ringQ := pp.BGVParams.RingQ()
+	level := ct.Level()
+	ringQLvl := ringQ.AtLevel(level)
+
+	c1 := ct.Value[1]
+	c1NTT := ringQ.NewPoly()
+	c1NTT.CopyLvl(level, c1)
+	if !ct.IsNTT {
+		ringQLvl.NTT(c1NTT, c1NTT)
+	}
+
+	shareNTT := ringQ.NewPoly()
+	shareNTT.CopyLvl(level, share)
+	ringQLvl.NTT(shareNTT, shareNTT)
+	ringQLvl.MForm(c1NTT, c1NTT)
+
+	signal := ringQ.NewPoly()
+	ringQLvl.MulCoeffsMontgomery(c1NTT, shareNTT, signal)
+	ringQLvl.INTT(signal, signal)
+	return signal
+}
+
+// PartDecSmudgingNoise samples only the smudging noise using crypto/rand (conservative).
+// Exported for benchmark decomposition.
+func PartDecSmudgingNoise(pp *params.PublicParams, ct *rlwe.Ciphertext) ring.Poly {
+	ringQ := pp.BGVParams.RingQ()
+	ringQLvl := ringQ.AtLevel(ct.Level())
+	return noise.SampleSmudgingNoise(ringQLvl, pp.Bsm)
+}
+
+// PartDecSmudgingNoiseFast samples only the smudging noise using ChaCha20 CSPRNG.
+// Exported for benchmark decomposition.
+func PartDecSmudgingNoiseFast(pp *params.PublicParams, ct *rlwe.Ciphertext) ring.Poly {
+	ringQ := pp.BGVParams.RingQ()
+	ringQLvl := ringQ.AtLevel(ct.Level())
+	return noise.SampleSmudgingNoiseFast(ringQLvl, pp.Bsm)
 }

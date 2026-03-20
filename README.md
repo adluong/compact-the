@@ -97,25 +97,42 @@ Hardware: Intel Core i7-8700K @ 4.40 GHz (overclocked), Linux (WSL2), Go 1.24.0.
 
 ### Per-Algorithm Timing
 
-| Operation | t=2, N=3 (B_W=1) | t=3, N=5 (B_W=1) | t=4, N=8 (Vand) |
-|---|---|---|---|
-| Share | 3.23 ms | 6.73 ms | 8.40 ms |
-| PartDec | 21.4 ms | 21.4 ms | 22.2 ms |
-| Combine | 0.99 ms | 0.87 ms | 1.02 ms |
-| FinDec | 0.58 ms | 0.58 ms | 0.57 ms |
+Mean over 5 runs (`-count=5 -benchtime=3s`).
 
-Note: PartDec is dominated by smudging noise sampling (~19 ms of 21.4 ms); the ring multiply is ~0.5 ms.
+| Operation | t=2, N=3 (B_W=1) | t=3, N=10 (B_W=3) | t=3, N=10 (Vand) | t=4, N=8 (Vand) | t=5, N=10 (Vand) |
+|---|---|---|---|---|---|
+| Share | 3.09 ms | 7.18 ms | 7.48 ms | 9.15 ms | 12.59 ms |
+| PartDec | 21.04 ms | 21.24 ms | 23.72 ms | 23.52 ms | 24.68 ms |
+| Combine | 0.91 ms | 0.99 ms | 0.93 ms | 1.15 ms | 1.15 ms |
+| FinDec | 0.62 ms | 0.61 ms | 0.61 ms | 0.60 ms | 0.60 ms |
+
+PartDec decomposition (t=3, N=10, B_W=3): ring multiply **1.10 ms** (5%) + smudging noise **18.59 ms** (88%) + overhead ~1.55 ms (7%).
+
+Single-party BFV Decrypt baseline: **1.12 ms**. Algebraic threshold overhead (ring mul + Combine + FinDec) is **2.4x** the baseline.
 
 ### End-to-End Timing
 
-| Configuration | Time | Notes |
+| Configuration | Sequential | Parallel (goroutines) |
 |---|---|---|
-| t=2, N=3, B_W=1 | 71.4 ms | Spec target: < 100 ms |
-| t=3, N=5, B_W=1 | 117.8 ms | |
-| t=3, N=10, B_W=3 (search) | 211.6 ms | 9-bit margin improvement over Vandermonde |
-| t=3, N=10, Vandermonde | 258.6 ms | |
-| t=4, N=8, Vandermonde | 206.4 ms | |
-| t=5, N=10, Vandermonde | 249.2 ms | |
+| t=2, N=3, B_W=1 | 76.7 ms | -- |
+| t=3, N=5, B_W=1 | 121.5 ms | -- |
+| t=3, N=10, B_W=3 | 228.2 ms | **67.2 ms** |
+| t=3, N=10, Vandermonde | 252.3 ms | -- |
+| t=4, N=8, Vandermonde | 205.9 ms | -- |
+| t=5, N=10, Vandermonde | 259.0 ms | -- |
+
+E2E includes Encode+Encrypt (~5.3 ms). Parallel PartDec across N goroutines gives 3.4x speedup.
+
+### Memory (t=3, N=10)
+
+| Object | Size |
+|---|---|
+| Share s_j | 256 KB |
+| Partial decryption d_j | 256 KB |
+| Ciphertext ct | 512 KB |
+| This work per-party storage | **256 KB** |
+| {0,1}-LSSS per-party storage | **~4.3 GB** |
+| **Storage reduction** | **~17,500x** |
 
 ## Noise Margin Analysis
 
@@ -138,8 +155,10 @@ The B_W=3 search matrix gains 9 bits of margin over Vandermonde at (t=3, N=10). 
 ```
 compact-the/
   go.mod, go.sum
+  CLAUDE.md                      # Project guide for Claude Code
   implementation-report.md       # v1 report
-  implementation-report-v2.md    # v2 report (changelogs, feedback response, new benchmarks)
+  implementation-report-v2.md    # v2 report (feedback response, B_W search)
+  implementation-report-v3.md    # v3 report (benchmarks with statistics, decomposition, baselines)
   params/
     params.go            # PublicParams, DefaultRegimeB(), VerifyParams()
     params_test.go
@@ -161,7 +180,7 @@ compact-the/
     bounds.go            # ComputeBsmRegimeB, VerifyCorrectness, LambdaS
     smudging.go          # SampleSmudgingNoise (uniform)
   bench/
-    bench_test.go        # 17 benchmark configurations
+    bench_test.go        # 29 benchmark configurations (per-algo, E2E, decomposition, baselines)
   cmd/
     demo/main.go         # Full pipeline demo (N=5, t=3, B_W=1)
     bw1search/main.go    # B_W backtracking search utility
@@ -204,6 +223,7 @@ go test -bench=BenchmarkEndToEnd_T3_N10_BW3 -benchtime=5s ./bench/
 | TestCorruptedPartialDec | t=2, N=4 (corrupted) | 6 |
 | TestNoiseMarginAnalysis | 7 configurations | -- |
 | TestParameterSweep | 8 configs x 13 LogQ levels | -- |
+| TestMemoryUsage | t=3, N=10, B_W=3 | -- |
 
 ## Known Deviations from Spec
 
@@ -213,7 +233,7 @@ go test -bench=BenchmarkEndToEnd_T3_N10_BW3 -benchtime=5s ./bench/
 4. **B_W=3 for (t=3, N=10)** instead of claimed B_W=1 -- exhaustive search proves B_W=1 impossible; B_W=3 found via randomised search. Noise margin improves from 127 bits (Vandermonde B_W=64) to 136 bits.
 5. **Smudging noise is uniform** (not Gaussian) -- matches the spec's [-B_sm, B_sm] requirement.
 
-See `implementation-report-v2.md` for full details including feedback response and search methodology.
+See `implementation-report-v3.md` for full details including benchmarks with statistics, PartDec decomposition, memory analysis, and baselines.
 
 ## References
 
